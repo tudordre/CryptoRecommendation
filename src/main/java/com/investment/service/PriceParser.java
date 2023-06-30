@@ -32,7 +32,7 @@ public class PriceParser {
         var prices = new LinkedList<CryptoCurrency>();
         try {
             Resource[] currencyFiles = ResourcePatternUtils.getResourcePatternResolver(resourceLoader).getResources("classpath*:/prices/*.csv");
-            if (currencyFiles.length==0){
+            if (currencyFiles.length == 0) {
                 LOGGER.warn("No file with crypto prices found");
 
                 return prices;
@@ -40,17 +40,29 @@ public class PriceParser {
             for (Resource currencyFile : currencyFiles) {
                 File file = currencyFile.getFile();
 
-                CryptoCurrency cryptoCurrency = new CryptoCurrency(file.getName(), new LinkedList<>());
                 try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-                    String line;
+                    LOGGER.info("Reading File " + file.getName());
+
+                    String line, symbol = null;
                     br.readLine();//ignore the title line
+                    List<CryptoCurrencyRecord> priceHistory = new LinkedList<>();
+                    if ((line = br.readLine()) != null) {
+                        String[] values = line.split(COMMA_DELIMITER);
+                        symbol = values[1];
+                        priceHistory.add(new CryptoCurrencyRecord(new Date(Long.parseLong(values[0])), Float.parseFloat(values[2])));
+                    }
                     while ((line = br.readLine()) != null) {
                         String[] values = line.split(COMMA_DELIMITER);
-                        cryptoCurrency.priceHistory().add(new CryptoCurrencyRecord(new Date(Long.parseLong(values[0])), Float.parseFloat(values[2])));
+                        priceHistory.add(new CryptoCurrencyRecord(new Date(Long.parseLong(values[0])), Float.parseFloat(values[2])));
                     }
+                    if (symbol == null) {
+                        LOGGER.warn("File " + file.getName() + " is empty");
+                    } else {
+                        CryptoCurrency cryptoCurrency = new CryptoCurrency(symbol, priceHistory);
+                        prices.add(cryptoCurrency);
+                    }
+                    LOGGER.info("Successfully Read File " + file.getName());
                 }
-
-                prices.add(cryptoCurrency);
             }
         } catch (IOException e) {
             LOGGER.error("Unable to load files with crypto prices", e);

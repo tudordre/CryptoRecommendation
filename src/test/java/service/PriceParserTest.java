@@ -28,6 +28,26 @@ public class PriceParserTest {
         List<CryptoCurrency> cryptoCurrencies = priceParser.importPrices();
 
         assertFalse(cryptoCurrencies.isEmpty());
+
         assertEquals(5, cryptoCurrencies.size());
+        assertEquals("BTC", cryptoCurrencies.get(0).symbol());
+        assertFalse(cryptoCurrencies.get(0).priceHistory().isEmpty());
+        assertEquals(100, cryptoCurrencies.get(0).priceHistory().size());
+
+        assertEquals("DOGE", cryptoCurrencies.get(1).symbol());
+        assertFalse(cryptoCurrencies.get(1).priceHistory().isEmpty());
+        assertEquals(90, cryptoCurrencies.get(1).priceHistory().size());
+
+        assertEquals("ETH", cryptoCurrencies.get(2).symbol());
+        assertFalse(cryptoCurrencies.get(2).priceHistory().isEmpty());
+        assertEquals(95, cryptoCurrencies.get(2).priceHistory().size());
+
+        assertEquals("LTC", cryptoCurrencies.get(3).symbol());
+        assertFalse(cryptoCurrencies.get(3).priceHistory().isEmpty());
+        assertEquals(85, cryptoCurrencies.get(3).priceHistory().size());
+
+        assertEquals("XRP", cryptoCurrencies.get(4).symbol());
+        assertFalse(cryptoCurrencies.get(4).priceHistory().isEmpty());
+        assertEquals(80, cryptoCurrencies.get(4).priceHistory().size());
     }
 }
