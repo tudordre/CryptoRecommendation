@@ -1,4 +1,4 @@
 package com.investment.dto;
 
-public record CryptoDetails(String symbol, float oldest, float newest, float min, float max) {
+public record CryptoDetails(String symbol, double oldest, double newest, double min, double max) {
 }

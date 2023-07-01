@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -33,7 +34,7 @@ public class PriceController {
     }
 
     @GetMapping("/highest")
-    public ResponseEntity getHighest() {
-        return ResponseEntity.ok("highest ");
+    public ResponseEntity<NormalizedCryptoCurrency> getHighestNormalizedRangeForDay(@RequestParam String date) {
+        return ResponseEntity.ok(priceService.getHighestNormalizedRangeForDay(date));
     }
 }

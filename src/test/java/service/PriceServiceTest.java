@@ -33,12 +33,12 @@ public class PriceServiceTest {
         LocalDateTime now = LocalDateTime.now();
 
         String symbol = "BTC";
-        float normalizedRange = (29_000f - 25_000) / 25_000;
+        double normalizedRange = (29_000d - 25_000d) / 25_000d;
 
         var currencyRecords = List.of(
-                new CryptoCurrencyRecord(now, 25_000),
-                new CryptoCurrencyRecord(now.plusHours(+3), 26_000),
-                new CryptoCurrencyRecord(now.plusHours(+6), 29_000)
+                new CryptoCurrencyRecord(now, 25_000d),
+                new CryptoCurrencyRecord(now.plusHours(+3), 26_000d),
+                new CryptoCurrencyRecord(now.plusHours(+6), 29_000d)
         );
 
         //when
@@ -56,16 +56,16 @@ public class PriceServiceTest {
     }
 
     @Test
-    public void getDetailedCrypto_whenNotCrypto_thenThrowNotFound() {
+    public void getDetailedCrypto_whenNotCrypto_thenThrowsNotFound() {
         //given
         LocalDateTime now = LocalDateTime.now();
 
         String symbol = "BTC";
 
         var currencyRecords = List.of(
-                new CryptoCurrencyRecord(now, 25_000),
-                new CryptoCurrencyRecord(now.plusHours(+3), 26_000),
-                new CryptoCurrencyRecord(now.plusHours(+6), 29_000)
+                new CryptoCurrencyRecord(now, 25_000d),
+                new CryptoCurrencyRecord(now.plusHours(+3), 26_000d),
+                new CryptoCurrencyRecord(now.plusHours(+6), 29_000d)
         );
 
         //when
@@ -87,9 +87,9 @@ public class PriceServiceTest {
         String symbol = "BTC";
 
         var currencyRecords = List.of(
-                new CryptoCurrencyRecord(now, 25_000),
-                new CryptoCurrencyRecord(now.plusHours(+3), 26_000),
-                new CryptoCurrencyRecord(now.plusHours(+6), 29_000)
+                new CryptoCurrencyRecord(now, 25_000d),
+                new CryptoCurrencyRecord(now.plusHours(+3), 26_000d),
+                new CryptoCurrencyRecord(now.plusHours(+6), 29_000d)
         );
 
         //when
@@ -102,9 +102,74 @@ public class PriceServiceTest {
 
         assertNotNull(cryptoDetails);
         assertEquals(symbol, cryptoDetails.symbol());
-        assertEquals(25_000, cryptoDetails.oldest());
-        assertEquals(29_000, cryptoDetails.newest());
-        assertEquals(25_000, cryptoDetails.min());
-        assertEquals(29_000, cryptoDetails.max());
+        assertEquals(25_000d, cryptoDetails.oldest());
+        assertEquals(29_000d, cryptoDetails.newest());
+        assertEquals(25_000d, cryptoDetails.min());
+        assertEquals(29_000d, cryptoDetails.max());
+    }
+
+    @Test
+    public void getHighestNormalizedRangeForDay_whenIncorrectDateFormat_thenThrowsBadRequest() {
+        //given
+
+        //when
+
+        PriceService priceService = new PriceService(priceParser);
+        //then
+
+        CustomException exception = assertThrows(CustomException.class, () -> priceService.getHighestNormalizedRangeForDay("asd"));
+
+        assertEquals(HttpStatus.BAD_REQUEST, exception.getHttpStatus());
+        assertEquals("Date invalid. Please use this format yyyy-MM-dd", exception.getMessage());
+    }
+
+    @Test
+    public void getHighestNormalizedRangeForDay_whenNoRecordsForDate_thenThrowsNotFound() {
+        //given
+
+        //when
+        when(priceParser.importPrices()).thenReturn(Map.of());
+
+        PriceService priceService = new PriceService(priceParser);
+
+        //then
+        CustomException exception = assertThrows(CustomException.class, () -> priceService.getHighestNormalizedRangeForDay("2023-01-01"));
+
+        assertEquals(HttpStatus.NOT_FOUND, exception.getHttpStatus());
+        assertEquals("No records for the date 2023-01-01", exception.getMessage());
+    }
+
+    @Test
+    public void getHighestNormalizedRangeForDay_whenExistingRecordsForDate_thenSuccess() {
+        //given
+        LocalDateTime now = LocalDateTime.now();
+
+        String symbol = "BTC";
+
+        var currencyRecords = List.of(
+                new CryptoCurrencyRecord(now, 25_000d),
+                new CryptoCurrencyRecord(now.plusHours(+3), 26_000d),
+                new CryptoCurrencyRecord(now.plusHours(+6), 29_000d)
+        );
+
+        String symbol2 = "BTC2";
+
+        var currencyRecords2 = List.of(
+                new CryptoCurrencyRecord(now, 25_000d),
+                new CryptoCurrencyRecord(now.plusHours(+3), 25_100d),
+                new CryptoCurrencyRecord(now.plusHours(+6), 25_200d)
+        );
+
+        //when
+        when(priceParser.importPrices()).thenReturn(Map.of(symbol, currencyRecords, symbol2, currencyRecords2));
+
+        PriceService priceService = new PriceService(priceParser);
+
+        //then
+        NormalizedCryptoCurrency result = priceService.getHighestNormalizedRangeForDay(now.toLocalDate().toString());
+
+        assertNotNull(result);
+        assertEquals(symbol, result.symbol());
+        assertEquals((29_000d - 25_000d) / 25_000d, result.normalizedRange());
     }
 }

@@ -7,10 +7,17 @@ import com.investment.exception.CustomException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.AbstractMap;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static com.investment.util.DateUtils.dateFromString;
 
 @Service
 public class PriceService {
@@ -22,19 +29,19 @@ public class PriceService {
         currencyMap = priceParser.importPrices();
     }
 
-    private float getMinPrice(List<CryptoCurrencyRecord> cryptoCurrencyRecords) {
+    private double getMinPrice(List<CryptoCurrencyRecord> cryptoCurrencyRecords) {
         return cryptoCurrencyRecords.stream().min(Comparator.comparing(CryptoCurrencyRecord::price)).get().price();
     }
 
-    private float getMaxPrice(List<CryptoCurrencyRecord> cryptoCurrencyRecords) {
+    private double getMaxPrice(List<CryptoCurrencyRecord> cryptoCurrencyRecords) {
         return cryptoCurrencyRecords.stream().max(Comparator.comparing(CryptoCurrencyRecord::price)).get().price();
     }
 
-    private float getOldestPrice(List<CryptoCurrencyRecord> cryptoCurrencyRecords) {
+    private double getOldestPrice(List<CryptoCurrencyRecord> cryptoCurrencyRecords) {
         return cryptoCurrencyRecords.stream().min(Comparator.comparing(CryptoCurrencyRecord::date)).get().price();
     }
 
-    private float getNewestPrice(List<CryptoCurrencyRecord> cryptoCurrencyRecords) {
+    private double getNewestPrice(List<CryptoCurrencyRecord> cryptoCurrencyRecords) {
         return cryptoCurrencyRecords.stream().max(Comparator.comparing(CryptoCurrencyRecord::date)).get().price();
     }
 
@@ -46,8 +53,8 @@ public class PriceService {
 
     private List<CryptoCurrencyRecord> getCryptoCurrencyById(String symbol) {
         List<CryptoCurrencyRecord> cryptoCurrencyRecords = currencyMap.get(symbol);
-        if(cryptoCurrencyRecords==null){
-            throw  new CustomException("Crypto Currency with symbol " + symbol + " not found", HttpStatus.NOT_FOUND);
+        if (cryptoCurrencyRecords == null) {
+            throw new CustomException("Crypto Currency with symbol " + symbol + " not found", HttpStatus.NOT_FOUND);
         }
         return cryptoCurrencyRecords;
     }
@@ -60,8 +67,47 @@ public class PriceService {
     }
 
     public CryptoDetails getDetailedCrypto(String symbol) {
-        symbol=symbol.toUpperCase();
+        symbol = symbol.toUpperCase();
         var cryptoCurrencyRecords = getCryptoCurrencyById(symbol);
         return new CryptoDetails(symbol, getOldestPrice(cryptoCurrencyRecords), getNewestPrice(cryptoCurrencyRecords), getMinPrice(cryptoCurrencyRecords), getMaxPrice(cryptoCurrencyRecords));
+    }
+
+    public NormalizedCryptoCurrency getHighestNormalizedRangeForDay(String date) {
+        LocalDate localDate;
+        try {
+            localDate = dateFromString(date);
+        } catch (Exception e) {
+            throw new CustomException("Date invalid. Please use this format yyyy-MM-dd", HttpStatus.BAD_REQUEST);
+        }
+
+        LocalDateTime startOfDay = localDate.atStartOfDay();
+        LocalDateTime endOfDay = localDate.atTime(LocalTime.MAX);
+//        var newMap = currencyMap.entrySet().stream()
+//                .collect(Collectors.toMap(Map.Entry::getKey,
+//                        entrySet -> entrySet.getValue().stream()
+//                                .filter(currencyRecord -> startOfDay.isBefore(currencyRecord.date()) && endOfDay.isAfter(currencyRecord.date()))
+//                                .toList())
+//                );
+//
+//        var normalizedList = currencyMap.entrySet().stream()
+//                .map(entrySet -> new AbstractMap.SimpleImmutableEntry<>(
+//                        entrySet.getKey(), entrySet.getValue().stream()
+//                        .filter(currencyRecord -> startOfDay.isBefore(currencyRecord.date()) && endOfDay.isAfter(currencyRecord.date()))
+//                        .toList())
+//                )
+//                .filter(entry -> !entry.getValue().isEmpty())
+//                .map(entry -> new NormalizedCryptoCurrency(entry.getKey(), getNormalizedRange(entry.getValue())))
+//                .toList();
+
+        return currencyMap.entrySet().stream()
+                .map(entrySet -> new AbstractMap.SimpleImmutableEntry<>(
+                        entrySet.getKey(), entrySet.getValue().stream()
+                        .filter(currencyRecord -> startOfDay.isBefore(currencyRecord.date()) && endOfDay.isAfter(currencyRecord.date()))
+                        .toList())
+                )
+                .filter(entry -> !entry.getValue().isEmpty())
+                .map(entry -> new NormalizedCryptoCurrency(entry.getKey(), getNormalizedRange(entry.getValue())))
+                .max(Comparator.comparingDouble(NormalizedCryptoCurrency::normalizedRange))
+                .orElseThrow(() -> new CustomException("No records for the date " + date, HttpStatus.NOT_FOUND));
     }
 }

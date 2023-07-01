@@ -50,11 +50,11 @@ public class PriceParser {
                     if ((line = br.readLine()) != null) {
                         String[] values = line.split(COMMA_DELIMITER);
                         symbol = values[1].toUpperCase();
-                        priceHistory.add(new CryptoCurrencyRecord(DateUtils.dateFromMillis(Long.parseLong(values[0])), Float.parseFloat(values[2])));
+                        priceHistory.add(new CryptoCurrencyRecord(DateUtils.dateFromMillis(Long.parseLong(values[0])), Double.parseDouble(values[2])));
                     }
                     while ((line = br.readLine()) != null) {
                         String[] values = line.split(COMMA_DELIMITER);
-                        priceHistory.add(new CryptoCurrencyRecord(DateUtils.dateFromMillis(Long.parseLong(values[0])), Float.parseFloat(values[2])));
+                        priceHistory.add(new CryptoCurrencyRecord(DateUtils.dateFromMillis(Long.parseLong(values[0])), Double.parseDouble(values[2])));
                     }
                     if (symbol == null) {
                         LOGGER.warn("File " + file.getName() + " is empty");
