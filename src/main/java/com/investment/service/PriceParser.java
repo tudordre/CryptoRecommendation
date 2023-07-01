@@ -1,7 +1,7 @@
 package com.investment.service;
 
-import com.investment.dto.CryptoCurrency;
 import com.investment.dto.CryptoCurrencyRecord;
+import com.investment.util.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
@@ -13,9 +13,10 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class PriceParser {
@@ -28,8 +29,8 @@ public class PriceParser {
         this.resourceLoader = resourceLoader;
     }
 
-    public List<CryptoCurrency> importPrices() {
-        var prices = new LinkedList<CryptoCurrency>();
+    public Map<String, List<CryptoCurrencyRecord>> importPrices() {
+        var prices = new HashMap<String, List<CryptoCurrencyRecord>>();
         try {
             Resource[] currencyFiles = ResourcePatternUtils.getResourcePatternResolver(resourceLoader).getResources("classpath*:/prices/*.csv");
             if (currencyFiles.length == 0) {
@@ -48,18 +49,18 @@ public class PriceParser {
                     List<CryptoCurrencyRecord> priceHistory = new LinkedList<>();
                     if ((line = br.readLine()) != null) {
                         String[] values = line.split(COMMA_DELIMITER);
-                        symbol = values[1];
-                        priceHistory.add(new CryptoCurrencyRecord(new Date(Long.parseLong(values[0])), Float.parseFloat(values[2])));
+                        symbol = values[1].toUpperCase();
+                        priceHistory.add(new CryptoCurrencyRecord(DateUtils.dateFromMillis(Long.parseLong(values[0])), Float.parseFloat(values[2])));
                     }
                     while ((line = br.readLine()) != null) {
                         String[] values = line.split(COMMA_DELIMITER);
-                        priceHistory.add(new CryptoCurrencyRecord(new Date(Long.parseLong(values[0])), Float.parseFloat(values[2])));
+                        priceHistory.add(new CryptoCurrencyRecord(DateUtils.dateFromMillis(Long.parseLong(values[0])), Float.parseFloat(values[2])));
                     }
                     if (symbol == null) {
                         LOGGER.warn("File " + file.getName() + " is empty");
                     } else {
-                        CryptoCurrency cryptoCurrency = new CryptoCurrency(symbol, priceHistory);
-                        prices.add(cryptoCurrency);
+                        List<CryptoCurrencyRecord> currencyRecords = prices.computeIfAbsent(symbol, k -> new LinkedList<>());
+                        currencyRecords.addAll(priceHistory);
                     }
                     LOGGER.info("Successfully Read File " + file.getName());
                 }

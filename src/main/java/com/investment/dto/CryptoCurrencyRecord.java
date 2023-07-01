@@ -1,6 +1,6 @@
 package com.investment.dto;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
-public record CryptoCurrencyRecord(Date date, float price) {
+public record CryptoCurrencyRecord(LocalDateTime date, float price) {
 }

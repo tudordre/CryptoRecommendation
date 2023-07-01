@@ -1,6 +1,5 @@
 package service;
 
-import com.investment.dto.CryptoCurrency;
 import com.investment.dto.CryptoCurrencyRecord;
 import com.investment.dto.CryptoDetails;
 import com.investment.dto.NormalizedCryptoCurrency;
@@ -13,8 +12,9 @@ import org.mockito.Mock;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -30,20 +30,20 @@ public class PriceServiceTest {
     @Test
     public void getAllCrypto_whenFoundCrypto_thenSuccess() {
         //given
-        Date now = new Date();
+        LocalDateTime now = LocalDateTime.now();
 
         String symbol = "BTC";
         float normalizedRange = (29_000f - 25_000) / 25_000;
 
-        var currency = new CryptoCurrency(symbol, List.of(
+        var currencyRecords = List.of(
                 new CryptoCurrencyRecord(now, 25_000),
-                new CryptoCurrencyRecord(new Date(now.getTime() + 3 * 3_600), 26_000),
-                new CryptoCurrencyRecord(new Date(now.getTime() + 3 * 3_600), 29_000)
-        ));
+                new CryptoCurrencyRecord(now.plusHours(+3), 26_000),
+                new CryptoCurrencyRecord(now.plusHours(+6), 29_000)
+        );
 
         //when
 
-        when(priceParser.importPrices()).thenReturn(List.of(currency));
+        when(priceParser.importPrices()).thenReturn(Map.of(symbol, currencyRecords));
         PriceService priceService = new PriceService(priceParser);
 
         //then
@@ -58,19 +58,19 @@ public class PriceServiceTest {
     @Test
     public void getDetailedCrypto_whenNotCrypto_thenThrowNotFound() {
         //given
-        Date now = new Date();
+        LocalDateTime now = LocalDateTime.now();
 
         String symbol = "BTC";
 
-        var currency = new CryptoCurrency(symbol, List.of(
+        var currencyRecords = List.of(
                 new CryptoCurrencyRecord(now, 25_000),
-                new CryptoCurrencyRecord(new Date(now.getTime() + 3 * 3_600), 26_000),
-                new CryptoCurrencyRecord(new Date(now.getTime() + 3 * 3_600), 29_000)
-        ));
+                new CryptoCurrencyRecord(now.plusHours(+3), 26_000),
+                new CryptoCurrencyRecord(now.plusHours(+6), 29_000)
+        );
 
         //when
 
-        when(priceParser.importPrices()).thenReturn(List.of(currency));
+        when(priceParser.importPrices()).thenReturn(Map.of(symbol, currencyRecords));
         PriceService priceService = new PriceService(priceParser);
 
         //then
@@ -82,19 +82,19 @@ public class PriceServiceTest {
     @Test
     public void getDetailedCrypto_whenFoundCrypto_thenSuccess() {
         //given
-        Date now = new Date();
+        LocalDateTime now = LocalDateTime.now();
 
         String symbol = "BTC";
 
-        var currency = new CryptoCurrency(symbol, List.of(
+        var currencyRecords = List.of(
                 new CryptoCurrencyRecord(now, 25_000),
-                new CryptoCurrencyRecord(new Date(now.getTime() + 3 * 3_600), 26_000),
-                new CryptoCurrencyRecord(new Date(now.getTime() + 6 * 3_600), 29_000)
-        ));
+                new CryptoCurrencyRecord(now.plusHours(+3), 26_000),
+                new CryptoCurrencyRecord(now.plusHours(+6), 29_000)
+        );
 
         //when
 
-        when(priceParser.importPrices()).thenReturn(List.of(currency));
+        when(priceParser.importPrices()).thenReturn(Map.of(symbol, currencyRecords));
         PriceService priceService = new PriceService(priceParser);
 
         //then

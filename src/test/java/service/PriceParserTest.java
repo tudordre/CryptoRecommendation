@@ -1,6 +1,6 @@
 package service;
 
-import com.investment.dto.CryptoCurrency;
+import com.investment.dto.CryptoCurrencyRecord;
 import com.investment.service.PriceParser;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -8,6 +8,7 @@ import org.mockito.InjectMocks;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -25,29 +26,29 @@ public class PriceParserTest {
         //when
 
         //then
-        List<CryptoCurrency> cryptoCurrencies = priceParser.importPrices();
+        Map<String, List<CryptoCurrencyRecord>> currencyMap = priceParser.importPrices();
 
-        assertFalse(cryptoCurrencies.isEmpty());
+        assertFalse(currencyMap.isEmpty());
 
-        assertEquals(5, cryptoCurrencies.size());
-        assertEquals("BTC", cryptoCurrencies.get(0).symbol());
-        assertFalse(cryptoCurrencies.get(0).priceHistory().isEmpty());
-        assertEquals(100, cryptoCurrencies.get(0).priceHistory().size());
+        assertEquals(5, currencyMap.size());
+        List<CryptoCurrencyRecord> currencyRecords = currencyMap.get("BTC");
+        assertFalse(currencyRecords.isEmpty());
+        assertEquals(200, currencyRecords.size());
 
-        assertEquals("DOGE", cryptoCurrencies.get(1).symbol());
-        assertFalse(cryptoCurrencies.get(1).priceHistory().isEmpty());
-        assertEquals(90, cryptoCurrencies.get(1).priceHistory().size());
+        currencyRecords = currencyMap.get("DOGE");
+        assertFalse(currencyRecords.isEmpty());
+        assertEquals(90, currencyRecords.size());
 
-        assertEquals("ETH", cryptoCurrencies.get(2).symbol());
-        assertFalse(cryptoCurrencies.get(2).priceHistory().isEmpty());
-        assertEquals(95, cryptoCurrencies.get(2).priceHistory().size());
+        currencyRecords = currencyMap.get("ETH");
+        assertFalse(currencyRecords.isEmpty());
+        assertEquals(95, currencyRecords.size());
 
-        assertEquals("LTC", cryptoCurrencies.get(3).symbol());
-        assertFalse(cryptoCurrencies.get(3).priceHistory().isEmpty());
-        assertEquals(85, cryptoCurrencies.get(3).priceHistory().size());
+        currencyRecords = currencyMap.get("LTC");
+        assertFalse(currencyRecords.isEmpty());
+        assertEquals(85, currencyRecords.size());
 
-        assertEquals("XRP", cryptoCurrencies.get(4).symbol());
-        assertFalse(cryptoCurrencies.get(4).priceHistory().isEmpty());
-        assertEquals(80, cryptoCurrencies.get(4).priceHistory().size());
+        currencyRecords = currencyMap.get("XRP");
+        assertFalse(currencyRecords.isEmpty());
+        assertEquals(80, currencyRecords.size());
     }
 }
