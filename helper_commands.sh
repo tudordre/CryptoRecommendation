@@ -20,8 +20,7 @@ docker-compose ps
 
 curl --location 'localhost:8080/prices'
 curl --location 'localhost:8080/prices/btc'
-curl --location 'localhost:8080/prices/highest?date=2022-01-01'
-
+curl --location 'localhost:8080/prices/btC?year=2022&month=1&period=1'
 
 
 
@@ -47,4 +46,4 @@ kubectl get services
 
 curl --location 'localhost:30589/prices'
 curl --location 'localhost:30589/prices/btc'
-curl --location 'localhost:30589/prices/highest?date=2022-01-01'
+curl --location 'localhost:30589/prices/btC?year=2022&month=1&period=1'

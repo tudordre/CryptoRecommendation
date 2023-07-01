@@ -75,22 +75,22 @@ public class PriceServiceTest {
         PriceService priceService = new PriceService(priceParser);
 
         //then
-        CustomException customException = assertThrows(CustomException.class, () -> priceService.getDetailedCrypto("asd"));
+        CustomException customException = assertThrows(CustomException.class, () -> priceService.getDetailedCrypto("asd", 2022, 1, 1));
 
         assertEquals(HttpStatus.NOT_FOUND, customException.getHttpStatus());
     }
 
     @Test
-    public void getDetailedCrypto_whenFoundCrypto_thenSuccess() {
+    public void getDetailedCrypto_whenNoValuesInSelectedPeriod_thenSuccess() {
         //given
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime dateTime = LocalDateTime.of(2022, 1, 1, 0, 0);
 
         String symbol = "BTC";
 
         var currencyRecords = List.of(
-                new CryptoCurrencyRecord(now, 25_000d),
-                new CryptoCurrencyRecord(now.plusHours(+3), 26_000d),
-                new CryptoCurrencyRecord(now.plusHours(+6), 29_000d)
+                new CryptoCurrencyRecord(dateTime, 25_000d),
+                new CryptoCurrencyRecord(dateTime.plusHours(+3), 26_000d),
+                new CryptoCurrencyRecord(dateTime.plusHours(+6), 29_000d)
         );
 
         //when
@@ -99,7 +99,32 @@ public class PriceServiceTest {
         PriceService priceService = new PriceService(priceParser);
 
         //then
-        CryptoDetails cryptoDetails = priceService.getDetailedCrypto(symbol);
+        CustomException exception = assertThrows(CustomException.class, () -> priceService.getDetailedCrypto(symbol, 2024, 1, 1));
+
+        assertEquals(HttpStatus.NOT_FOUND, exception.getHttpStatus());
+        assertEquals("Crypto Currency with symbol BTC not has no values in the selected interval", exception.getMessage());
+    }
+
+    @Test
+    public void getDetailedCrypto_whenFoundCrypto_thenSuccess() {
+        //given
+        LocalDateTime dateTime = LocalDateTime.of(2022, 1, 1, 0, 0);
+
+        String symbol = "BTC";
+
+        var currencyRecords = List.of(
+                new CryptoCurrencyRecord(dateTime, 25_000d),
+                new CryptoCurrencyRecord(dateTime.plusHours(+3), 26_000d),
+                new CryptoCurrencyRecord(dateTime.plusHours(+6), 29_000d)
+        );
+
+        //when
+
+        when(priceParser.importPrices()).thenReturn(Map.of(symbol, currencyRecords));
+        PriceService priceService = new PriceService(priceParser);
+
+        //then
+        CryptoDetails cryptoDetails = priceService.getDetailedCrypto(symbol, 2022, 1, 1);
 
         assertNotNull(cryptoDetails);
         assertEquals(symbol, cryptoDetails.symbol());

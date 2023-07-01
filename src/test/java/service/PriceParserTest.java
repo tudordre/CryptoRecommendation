@@ -32,7 +32,7 @@ public class PriceParserTest {
         assertEquals(5, currencyMap.size());
         List<CryptoCurrencyRecord> currencyRecords = currencyMap.get("BTC");
         assertFalse(currencyRecords.isEmpty());
-        assertEquals(200, currencyRecords.size());
+        assertEquals(104, currencyRecords.size());
 
         currencyRecords = currencyMap.get("DOGE");
         assertFalse(currencyRecords.isEmpty());

@@ -20,11 +20,9 @@ import static com.investment.util.DateUtils.dateFromString;
 
 @Service
 public class PriceService {
-    private final PriceParser priceParser;
     private Map<String, List<CryptoCurrencyRecord>> currencyMap;
 
     public PriceService(PriceParser priceParser) {
-        this.priceParser = priceParser;
         currencyMap = priceParser.importPrices();
     }
 
@@ -65,9 +63,19 @@ public class PriceService {
                 .collect(Collectors.toList());
     }
 
-    public CryptoDetails getDetailedCrypto(String symbol) {
+    public CryptoDetails getDetailedCrypto(String symbol, int year, int month, int period) {
+        LocalDateTime startDate = LocalDateTime.of(year, month, 1, 0, 0);
+        LocalDateTime endDate = startDate.plusMonths(period).minusSeconds(1);
         symbol = symbol.toUpperCase();
-        var cryptoCurrencyRecords = getCryptoCurrencyById(symbol);
+
+        var cryptoCurrencyRecords = getCryptoCurrencyById(symbol).stream()
+                .filter(curencyRecord -> !startDate.isAfter(curencyRecord.date()) && !endDate.isBefore(curencyRecord.date()))
+                .toList();
+
+        if (cryptoCurrencyRecords.isEmpty()) {
+            throw new CustomException("Crypto Currency with symbol " + symbol + " not has no values in the selected interval", HttpStatus.NOT_FOUND);
+        }
+
         return new CryptoDetails(symbol, getOldestPrice(cryptoCurrencyRecords), getNewestPrice(cryptoCurrencyRecords), getMinPrice(cryptoCurrencyRecords), getMaxPrice(cryptoCurrencyRecords));
     }
 
