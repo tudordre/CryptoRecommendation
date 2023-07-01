@@ -1,0 +1,4 @@
+#Local Environment
+
+csv:
+  path: ./prices

@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  crypto-app:
+    image: crypto-app
+    container_name: crypto-app
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    ports:
+      - "8080:8080"
+    networks:
+      - app-network
+
+networks:
+  app-network:

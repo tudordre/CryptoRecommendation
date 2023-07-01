@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment # Kubernetes resource kind we are creating
+metadata:
+  name: crypto-boot-deployment
+spec:
+  selector:
+    matchLabels:
+      app: cryptoapp
+  replicas: 1 # Number of replicas that will be created for this deployment
+  template:
+    metadata:
+      labels:
+        app: cryptoapp
+    spec:
+      containers:
+        - name: myapp-spring-boot
+          image: crypto-app
+          # Image that will be used to containers in the cluster
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080 # “containerPort” defines the port on which app can be reached out inside the container.

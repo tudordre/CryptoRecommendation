@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
+import static com.investment.util.DateUtils.dateFromString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -142,22 +143,23 @@ public class PriceServiceTest {
     @Test
     public void getHighestNormalizedRangeForDay_whenExistingRecordsForDate_thenSuccess() {
         //given
-        LocalDateTime now = LocalDateTime.now();
+        var date = dateFromString("2022-01-01").atStartOfDay();
+
 
         String symbol = "BTC";
 
         var currencyRecords = List.of(
-                new CryptoCurrencyRecord(now, 25_000d),
-                new CryptoCurrencyRecord(now.plusHours(+3), 26_000d),
-                new CryptoCurrencyRecord(now.plusHours(+6), 29_000d)
+                new CryptoCurrencyRecord(date, 25_000d),
+                new CryptoCurrencyRecord(date.plusHours(+3), 26_000d),
+                new CryptoCurrencyRecord(date.plusHours(+6), 29_000d)
         );
 
         String symbol2 = "BTC2";
 
         var currencyRecords2 = List.of(
-                new CryptoCurrencyRecord(now, 25_000d),
-                new CryptoCurrencyRecord(now.plusHours(+3), 25_100d),
-                new CryptoCurrencyRecord(now.plusHours(+6), 25_200d)
+                new CryptoCurrencyRecord(date, 25_000d),
+                new CryptoCurrencyRecord(date.plusHours(+3), 25_100d),
+                new CryptoCurrencyRecord(date.plusHours(+6), 25_200d)
         );
 
         //when
@@ -166,7 +168,7 @@ public class PriceServiceTest {
         PriceService priceService = new PriceService(priceParser);
 
         //then
-        NormalizedCryptoCurrency result = priceService.getHighestNormalizedRangeForDay(now.toLocalDate().toString());
+        NormalizedCryptoCurrency result = priceService.getHighestNormalizedRangeForDay(date.toLocalDate().toString());
 
         assertNotNull(result);
         assertEquals(symbol, result.symbol());

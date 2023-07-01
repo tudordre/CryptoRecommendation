@@ -1,0 +1,4 @@
+#Docker/K8s Containerized Environment
+
+csv:
+  path: /app/prices

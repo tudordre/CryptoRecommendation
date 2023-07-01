@@ -16,14 +16,13 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 @RunWith(SpringRunner.class)
 public class PriceParserTest {
 
-    @InjectMocks
-    PriceParser priceParser;
 
     @Test
     public void importPrices_whenPrices_thenSuccess() {
         //given
 
         //when
+        PriceParser priceParser = new PriceParser("./prices");
 
         //then
         Map<String, List<CryptoCurrencyRecord>> currencyMap = priceParser.importPrices();

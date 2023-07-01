@@ -12,7 +12,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.AbstractMap;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -82,27 +81,11 @@ public class PriceService {
 
         LocalDateTime startOfDay = localDate.atStartOfDay();
         LocalDateTime endOfDay = localDate.atTime(LocalTime.MAX);
-//        var newMap = currencyMap.entrySet().stream()
-//                .collect(Collectors.toMap(Map.Entry::getKey,
-//                        entrySet -> entrySet.getValue().stream()
-//                                .filter(currencyRecord -> startOfDay.isBefore(currencyRecord.date()) && endOfDay.isAfter(currencyRecord.date()))
-//                                .toList())
-//                );
-//
-//        var normalizedList = currencyMap.entrySet().stream()
-//                .map(entrySet -> new AbstractMap.SimpleImmutableEntry<>(
-//                        entrySet.getKey(), entrySet.getValue().stream()
-//                        .filter(currencyRecord -> startOfDay.isBefore(currencyRecord.date()) && endOfDay.isAfter(currencyRecord.date()))
-//                        .toList())
-//                )
-//                .filter(entry -> !entry.getValue().isEmpty())
-//                .map(entry -> new NormalizedCryptoCurrency(entry.getKey(), getNormalizedRange(entry.getValue())))
-//                .toList();
 
         return currencyMap.entrySet().stream()
                 .map(entrySet -> new AbstractMap.SimpleImmutableEntry<>(
                         entrySet.getKey(), entrySet.getValue().stream()
-                        .filter(currencyRecord -> startOfDay.isBefore(currencyRecord.date()) && endOfDay.isAfter(currencyRecord.date()))
+                        .filter(currencyRecord -> !startOfDay.isAfter(currencyRecord.date()) && !endOfDay.isBefore(currencyRecord.date()))
                         .toList())
                 )
                 .filter(entry -> !entry.getValue().isEmpty())

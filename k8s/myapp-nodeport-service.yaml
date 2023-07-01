@@ -1,0 +1,14 @@
+apiVersion: v1 # Kubernetes API version
+kind: Service # Kubernetes resource kind we are creating
+metadata: # Metadata of the resource kind we are creating
+  name: crypto-k8s-svc
+spec:
+  selector:
+    app: cryptoapp
+  ports:
+    - protocol: "TCP"
+      port: 8080 # The port that the service is running on in the cluster
+      targetPort: 8080
+  type: NodePort # type of the service.
+
+# incoming traffic directed to service on port 8080 (port: 8080) is forwarded to port 8080 on container (targetPort: 8080)
