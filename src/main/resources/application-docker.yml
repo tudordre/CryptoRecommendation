@@ -2,3 +2,6 @@
 
 csv:
   path: /app/prices
+
+currencies:
+  supported: btc,doge,eth,ltc,xrp,bnb,usdt,usdc,ada,sol,trx

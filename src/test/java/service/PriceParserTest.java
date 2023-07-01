@@ -4,7 +4,6 @@ import com.investment.dto.CryptoCurrencyRecord;
 import com.investment.service.PriceParser;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.List;
@@ -12,6 +11,7 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 @RunWith(SpringRunner.class)
 public class PriceParserTest {
@@ -22,7 +22,7 @@ public class PriceParserTest {
         //given
 
         //when
-        PriceParser priceParser = new PriceParser("./prices");
+        PriceParser priceParser = new PriceParser("./prices", "btc,doge,eth,ltc,xrp,bnb,usdt,usdc,ada,sol,trx");
 
         //then
         Map<String, List<CryptoCurrencyRecord>> currencyMap = priceParser.importPrices();
@@ -49,5 +49,8 @@ public class PriceParserTest {
         currencyRecords = currencyMap.get("XRP");
         assertFalse(currencyRecords.isEmpty());
         assertEquals(80, currencyRecords.size());
+
+        currencyRecords = currencyMap.get("LUNA");
+        assertNull(currencyRecords);
     }
 }
