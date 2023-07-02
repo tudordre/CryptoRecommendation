@@ -13,3 +13,7 @@ security:
   ttl:
     ips: 60000 # refresh attempts every minute
   max_attempts: 10 #10 attempts
+
+#server port
+server:
+  port: 8080
