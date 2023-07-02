@@ -16,7 +16,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 @RunWith(SpringRunner.class)
 public class PriceParserTest {
 
-
     @Test
     public void importPrices_whenPrices_thenSuccess() {
         //given

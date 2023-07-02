@@ -1,7 +1,15 @@
 #Local Environment
 
+#path to the csv files with crypto currencies
 csv:
   path: ./prices
 
+#supported crypto currencies
 currencies:
   supported: btc,doge,eth,ltc,xrp,bnb,usdt,usdc,ada,sol,trx
+
+#rate limit ips to 10 attempts per 1 minute
+security:
+  ttl:
+    ips: 60000 # refresh attempts every minute
+  max_attempts: 10 #10 attempts

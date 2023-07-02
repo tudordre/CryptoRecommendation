@@ -32,7 +32,7 @@ public class PriceParser {
         this.approvedCurrencies = Arrays.stream(approvedCurrencies.split(",")).map(String::toUpperCase).collect(Collectors.toSet());
     }
 
-    private final Logger LOGGER = LoggerFactory.getLogger("PriceParser");
+    private static final Logger LOGGER = LoggerFactory.getLogger(PriceParser.class);
 
     private static final String COMMA_DELIMITER = ",";
 
