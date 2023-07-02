@@ -2,7 +2,7 @@ package com.investment.controller;
 
 import com.investment.dto.CryptoDetails;
 import com.investment.dto.NormalizedCryptoCurrency;
-import com.investment.service.PriceService;
+import com.investment.service.CryptoCurrencyService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.http.ResponseEntity;
@@ -20,31 +20,35 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
+/**
+ * Controller class, defines the endpoints for crypto currencies.
+ */
 @RestController
 @RequestMapping("/prices")
 @Validated
-public class PriceController {
-    private final PriceService priceService;
+public class CryptoCurrencyController {
+    private final CryptoCurrencyService cryptoCurrencyService;
 
-    public PriceController(PriceService priceService) {
-        this.priceService = priceService;
+    public CryptoCurrencyController(CryptoCurrencyService cryptoCurrencyService) {
+        this.cryptoCurrencyService = cryptoCurrencyService;
     }
 
     @ApiOperation(value = " Returns a descending of list of all the cryptos " +
             " sorted descending by normalized range .")
     @GetMapping
     public ResponseEntity<List<NormalizedCryptoCurrency>> getAll() {
-        return ResponseEntity.ok(priceService.getAllCrypto());
+        return ResponseEntity.ok(cryptoCurrencyService.getAllCryptoWithNormalizedRange());
     }
 
     @ApiOperation(value = "Returns metrics about a crypto oldest/newest/min/max values")
     @GetMapping("/{symbol}")
-    public ResponseEntity<CryptoDetails> getNormalized(@ApiParam("currency symbol") @PathVariable("symbol") @NotNull @NotEmpty @Valid String symbol,
-                                                       @ApiParam("year (between 2015 and 2025)") @RequestParam @NotNull @Min(value = 2015, message = "year must be minimum 2015") @Max(value = 2024, message = "year must be maximum 2024") int year,
-                                                       @ApiParam("month (between 1 and 12)") @RequestParam @NotNull @Min(value = 1, message = "month must be minimum 1") @Max(value = 12, message = "month must be minimum 12") @Valid int month,
-                                                       @ApiParam("period in months (between 1 and 120)") @RequestParam(required = false, defaultValue = "1") @Min(value = 1, message = "period must be minimum 1") @Max(value = 120, message = "period must be minimum 120") @Valid int period) {
+    public ResponseEntity<CryptoDetails> getNormalized(
+            @ApiParam("currency symbol") @PathVariable("symbol") @NotNull @NotEmpty @Valid String symbol,
+            @ApiParam("year (between 2015 and 2025)") @RequestParam @NotNull @Min(value = 2015, message = "year must be minimum 2015") @Max(value = 2024, message = "year must be maximum 2024") int year,
+            @ApiParam("month (between 1 and 12)") @RequestParam @NotNull @Min(value = 1, message = "month must be minimum 1") @Max(value = 12, message = "month must be minimum 12") @Valid int month,
+            @ApiParam("period in months (between 1 and 120)") @RequestParam(required = false, defaultValue = "1") @Min(value = 1, message = "period must be minimum 1") @Max(value = 120, message = "period must be minimum 120") @Valid int period) {
         System.out.println("get detailed crypto");
-        return ResponseEntity.ok(priceService.getDetailedCrypto(symbol, year, month, period));
+        return ResponseEntity.ok(cryptoCurrencyService.getDetailedCrypto(symbol, year, month, period));
     }
 
     @ApiOperation(value = "Return the crypto with the highest normalized range for a " +
@@ -52,6 +56,6 @@ public class PriceController {
     @GetMapping("/highest")
     public ResponseEntity<NormalizedCryptoCurrency> getHighestNormalizedRangeForDay(
             @ApiParam("date (in format yyyy-MM-dd)") @RequestParam String date) {
-        return ResponseEntity.ok(priceService.getHighestNormalizedRangeForDay(date));
+        return ResponseEntity.ok(cryptoCurrencyService.getHighestNormalizedRangeForDay(date));
     }
 }

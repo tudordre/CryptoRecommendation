@@ -22,8 +22,10 @@ Main features
 - Crypto currency with the highest normalized.
 - Reads data from CVS. Supports multiple files for the same crypto currency.
 - Supported crypto currencies stored in a property file. The ones present in the CSV but not present in the supported list won't be taken in account. In order to add a new one add it also in the property file. 
-- Containerization with Docker and Kubernetes. Steps to run the service on Docker/Kubernetes in the file
+- Containerization with Docker and Kubernetes. Steps to run the service on Docker/Kubernetes in the file [helper_commands.sh](https://github.com/tudordre/CryptoRecommendation/blob/main/helper_commands.sh)
 - Rate limit the malicious users base on their ip. Uses a simple HashMap for storing the ip activities which works correctly for just one instance of the service.
+- All classes with business logic are covered by unit tests. The others are excluded from test coverage reports.
+- Swagger documentation of the service and the endpoints
 
 # How to run this project locally?
 

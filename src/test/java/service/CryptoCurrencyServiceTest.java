@@ -4,8 +4,8 @@ import com.investment.dto.CryptoCurrencyRecord;
 import com.investment.dto.CryptoDetails;
 import com.investment.dto.NormalizedCryptoCurrency;
 import com.investment.exception.CustomException;
-import com.investment.service.PriceParser;
-import com.investment.service.PriceService;
+import com.investment.service.CryptoCurrencyParser;
+import com.investment.service.CryptoCurrencyService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -24,9 +24,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @RunWith(SpringRunner.class)
-public class PriceServiceTest {
+public class CryptoCurrencyServiceTest {
     @Mock
-    private PriceParser priceParser;
+    private CryptoCurrencyParser cryptoCurrencyParser;
 
     @Test
     public void getAllCrypto_whenFoundCrypto_thenSuccess() {
@@ -44,11 +44,11 @@ public class PriceServiceTest {
 
         //when
 
-        when(priceParser.importPrices()).thenReturn(Map.of(symbol, currencyRecords));
-        PriceService priceService = new PriceService(priceParser);
+        when(cryptoCurrencyParser.importPrices()).thenReturn(Map.of(symbol, currencyRecords));
+        CryptoCurrencyService cryptoCurrencyService = new CryptoCurrencyService(cryptoCurrencyParser);
 
         //then
-        List<NormalizedCryptoCurrency> cryptoCurrencies = priceService.getAllCrypto();
+        List<NormalizedCryptoCurrency> cryptoCurrencies = cryptoCurrencyService.getAllCryptoWithNormalizedRange();
 
         assertFalse(cryptoCurrencies.isEmpty());
         assertEquals(1, cryptoCurrencies.size());
@@ -71,11 +71,11 @@ public class PriceServiceTest {
 
         //when
 
-        when(priceParser.importPrices()).thenReturn(Map.of(symbol, currencyRecords));
-        PriceService priceService = new PriceService(priceParser);
+        when(cryptoCurrencyParser.importPrices()).thenReturn(Map.of(symbol, currencyRecords));
+        CryptoCurrencyService cryptoCurrencyService = new CryptoCurrencyService(cryptoCurrencyParser);
 
         //then
-        CustomException customException = assertThrows(CustomException.class, () -> priceService.getDetailedCrypto("asd", 2022, 1, 1));
+        CustomException customException = assertThrows(CustomException.class, () -> cryptoCurrencyService.getDetailedCrypto("asd", 2022, 1, 1));
 
         assertEquals(HttpStatus.NOT_FOUND, customException.getHttpStatus());
     }
@@ -95,11 +95,11 @@ public class PriceServiceTest {
 
         //when
 
-        when(priceParser.importPrices()).thenReturn(Map.of(symbol, currencyRecords));
-        PriceService priceService = new PriceService(priceParser);
+        when(cryptoCurrencyParser.importPrices()).thenReturn(Map.of(symbol, currencyRecords));
+        CryptoCurrencyService cryptoCurrencyService = new CryptoCurrencyService(cryptoCurrencyParser);
 
         //then
-        CustomException exception = assertThrows(CustomException.class, () -> priceService.getDetailedCrypto(symbol, 2024, 1, 1));
+        CustomException exception = assertThrows(CustomException.class, () -> cryptoCurrencyService.getDetailedCrypto(symbol, 2024, 1, 1));
 
         assertEquals(HttpStatus.NOT_FOUND, exception.getHttpStatus());
         assertEquals("Crypto Currency with symbol BTC not has no values in the selected interval", exception.getMessage());
@@ -120,11 +120,11 @@ public class PriceServiceTest {
 
         //when
 
-        when(priceParser.importPrices()).thenReturn(Map.of(symbol, currencyRecords));
-        PriceService priceService = new PriceService(priceParser);
+        when(cryptoCurrencyParser.importPrices()).thenReturn(Map.of(symbol, currencyRecords));
+        CryptoCurrencyService cryptoCurrencyService = new CryptoCurrencyService(cryptoCurrencyParser);
 
         //then
-        CryptoDetails cryptoDetails = priceService.getDetailedCrypto(symbol, 2022, 1, 1);
+        CryptoDetails cryptoDetails = cryptoCurrencyService.getDetailedCrypto(symbol, 2022, 1, 1);
 
         assertNotNull(cryptoDetails);
         assertEquals(symbol, cryptoDetails.symbol());
@@ -140,10 +140,10 @@ public class PriceServiceTest {
 
         //when
 
-        PriceService priceService = new PriceService(priceParser);
+        CryptoCurrencyService cryptoCurrencyService = new CryptoCurrencyService(cryptoCurrencyParser);
         //then
 
-        CustomException exception = assertThrows(CustomException.class, () -> priceService.getHighestNormalizedRangeForDay("asd"));
+        CustomException exception = assertThrows(CustomException.class, () -> cryptoCurrencyService.getHighestNormalizedRangeForDay("asd"));
 
         assertEquals(HttpStatus.BAD_REQUEST, exception.getHttpStatus());
         assertEquals("Date invalid. Please use this format yyyy-MM-dd", exception.getMessage());
@@ -154,12 +154,12 @@ public class PriceServiceTest {
         //given
 
         //when
-        when(priceParser.importPrices()).thenReturn(Map.of());
+        when(cryptoCurrencyParser.importPrices()).thenReturn(Map.of());
 
-        PriceService priceService = new PriceService(priceParser);
+        CryptoCurrencyService cryptoCurrencyService = new CryptoCurrencyService(cryptoCurrencyParser);
 
         //then
-        CustomException exception = assertThrows(CustomException.class, () -> priceService.getHighestNormalizedRangeForDay("2023-01-01"));
+        CustomException exception = assertThrows(CustomException.class, () -> cryptoCurrencyService.getHighestNormalizedRangeForDay("2023-01-01"));
 
         assertEquals(HttpStatus.NOT_FOUND, exception.getHttpStatus());
         assertEquals("No records for the date 2023-01-01", exception.getMessage());
@@ -188,12 +188,12 @@ public class PriceServiceTest {
         );
 
         //when
-        when(priceParser.importPrices()).thenReturn(Map.of(symbol, currencyRecords, symbol2, currencyRecords2));
+        when(cryptoCurrencyParser.importPrices()).thenReturn(Map.of(symbol, currencyRecords, symbol2, currencyRecords2));
 
-        PriceService priceService = new PriceService(priceParser);
+        CryptoCurrencyService cryptoCurrencyService = new CryptoCurrencyService(cryptoCurrencyParser);
 
         //then
-        NormalizedCryptoCurrency result = priceService.getHighestNormalizedRangeForDay(date.toLocalDate().toString());
+        NormalizedCryptoCurrency result = cryptoCurrencyService.getHighestNormalizedRangeForDay(date.toLocalDate().toString());
 
         assertNotNull(result);
         assertEquals(symbol, result.symbol());

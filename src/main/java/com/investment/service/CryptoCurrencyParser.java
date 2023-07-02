@@ -22,24 +22,37 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * Class responsible for reading data from CSV files
+ */
 @Service
-public class PriceParser {
+public class CryptoCurrencyParser {
+    /**
+     * Relative path to the folder with CSV files
+     */
     private final String csvPath;
+    /**
+     * Set of approved crypto currencies
+     */
     private final Set<String> approvedCurrencies;
 
-    public PriceParser(@Value("${csv.path}") String csvPath, @Value("${currencies.supported}") String approvedCurrencies) {
+    public CryptoCurrencyParser(@Value("${csv.path}") String csvPath, @Value("${currencies.supported}") String approvedCurrencies) {
         this.csvPath = csvPath;
         this.approvedCurrencies = Arrays.stream(approvedCurrencies.split(",")).map(String::toUpperCase).collect(Collectors.toSet());
     }
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PriceParser.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CryptoCurrencyParser.class);
 
     private static final String COMMA_DELIMITER = ",";
 
+    /**
+     * Reads data from CSV files
+     * @return Map of crypto currencies
+     */
     public Map<String, List<CryptoCurrencyRecord>> importPrices() {
         var prices = new HashMap<String, List<CryptoCurrencyRecord>>();
-        try (Stream<Path> paths = Files.walk(Paths.get(csvPath))) {
-            paths.filter(path -> Files.isRegularFile(path) && path.toFile().getName().endsWith(".csv"))
+        try (Stream<Path> paths = Files.walk(Paths.get(csvPath))) { //Read all files from the folder
+            paths.filter(path -> Files.isRegularFile(path) && path.toFile().getName().endsWith(".csv"))//filter just .csv files
                     .forEach(path -> {
                         File file = path.toFile();
                         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
@@ -51,7 +64,7 @@ public class PriceParser {
                             if ((line = br.readLine()) != null) {
                                 String[] values = line.split(COMMA_DELIMITER);
                                 symbol = values[1].toUpperCase();
-                                priceHistory.add(new CryptoCurrencyRecord(DateUtils.dateFromMillis(Long.parseLong(values[0])), Double.parseDouble(values[2])));
+                                priceHistory.add(new CryptoCurrencyRecord(DateUtils.dateFromMilliseconds(Long.parseLong(values[0])), Double.parseDouble(values[2])));
                             }
                             if (symbol == null || symbol.isEmpty()) {
                                 LOGGER.warn("File " + file.getName() + " is empty");
@@ -60,7 +73,7 @@ public class PriceParser {
                             } else {
                                 while ((line = br.readLine()) != null) {
                                     String[] values = line.split(COMMA_DELIMITER);
-                                    priceHistory.add(new CryptoCurrencyRecord(DateUtils.dateFromMillis(Long.parseLong(values[0])), Double.parseDouble(values[2])));
+                                    priceHistory.add(new CryptoCurrencyRecord(DateUtils.dateFromMilliseconds(Long.parseLong(values[0])), Double.parseDouble(values[2])));
                                 }
 
                                 List<CryptoCurrencyRecord> currencyRecords = prices.computeIfAbsent(symbol, k -> new LinkedList<>());

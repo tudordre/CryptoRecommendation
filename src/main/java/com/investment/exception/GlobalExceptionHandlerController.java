@@ -11,6 +11,9 @@ import javax.validation.ConstraintViolationException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 
+/**
+ * Exception handling for all the exception thrown by the service.
+ */
 @ControllerAdvice
 public class GlobalExceptionHandlerController {
 

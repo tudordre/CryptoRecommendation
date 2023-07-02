@@ -2,7 +2,7 @@ package interceptor;
 
 import com.investment.exception.CustomException;
 import com.investment.interceptor.SecurityInterceptor;
-import com.investment.service.SecurityLimiterService;
+import com.investment.service.IPRateLimiterService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -21,7 +21,7 @@ import static org.mockito.Mockito.when;
 @RunWith(SpringRunner.class)
 public class SecurityInterceptorTest {
     @Mock
-    private SecurityLimiterService securityLimiterService;
+    private IPRateLimiterService IPRateLimiterService;
 
     @InjectMocks
     private SecurityInterceptor securityInterceptor;
@@ -33,7 +33,7 @@ public class SecurityInterceptorTest {
         MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
 
         //when
-        when(securityLimiterService.checkIp(any())).thenReturn(false);
+        when(IPRateLimiterService.checkIp(any())).thenReturn(false);
 
         //then
         CustomException exception = assertThrows(CustomException.class, () -> securityInterceptor.preHandle(mockHttpServletRequest, mockHttpServletResponse, null));
@@ -49,7 +49,7 @@ public class SecurityInterceptorTest {
         MockHttpServletResponse mockHttpServletResponse = new MockHttpServletResponse();
 
         //when
-        when(securityLimiterService.checkIp(any())).thenReturn(true);
+        when(IPRateLimiterService.checkIp(any())).thenReturn(true);
 
         //then
         boolean result = securityInterceptor.preHandle(mockHttpServletRequest, mockHttpServletResponse, null);

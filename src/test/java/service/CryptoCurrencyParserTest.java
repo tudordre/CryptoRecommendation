@@ -1,7 +1,7 @@
 package service;
 
 import com.investment.dto.CryptoCurrencyRecord;
-import com.investment.service.PriceParser;
+import com.investment.service.CryptoCurrencyParser;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -14,17 +14,17 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 @RunWith(SpringRunner.class)
-public class PriceParserTest {
+public class CryptoCurrencyParserTest {
 
     @Test
     public void importPrices_whenPrices_thenSuccess() {
         //given
 
         //when
-        PriceParser priceParser = new PriceParser("./prices", "btc,doge,eth,ltc,xrp,bnb,usdt,usdc,ada,sol,trx");
+        CryptoCurrencyParser cryptoCurrencyParser = new CryptoCurrencyParser("./prices", "btc,doge,eth,ltc,xrp,bnb,usdt,usdc,ada,sol,trx");
 
         //then
-        Map<String, List<CryptoCurrencyRecord>> currencyMap = priceParser.importPrices();
+        Map<String, List<CryptoCurrencyRecord>> currencyMap = cryptoCurrencyParser.importPrices();
 
         assertFalse(currencyMap.isEmpty());
 

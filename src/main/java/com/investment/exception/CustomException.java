@@ -4,6 +4,10 @@ import org.springframework.http.HttpStatus;
 
 import java.io.Serial;
 
+/**
+ * Class defining a custom with message and http status.
+ */
+
 public class CustomException extends RuntimeException {
 
   @Serial

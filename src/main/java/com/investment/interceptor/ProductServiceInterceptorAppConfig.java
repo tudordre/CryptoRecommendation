@@ -5,6 +5,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+/**
+ * Configuration class that adds the SecurityInterceptor
+ */
 @Component
 public class ProductServiceInterceptorAppConfig implements WebMvcConfigurer {
     @Autowired

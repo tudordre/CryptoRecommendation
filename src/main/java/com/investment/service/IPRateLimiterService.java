@@ -12,17 +12,29 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * Class the defines IP rate limiter
+ */
 @Service
 @EnableScheduling
-public class SecurityLimiterService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(SecurityLimiterService.class);
+public class IPRateLimiterService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(IPRateLimiterService.class);
+    /**
+     * Cache containing the IP and the number of the attempts in the last interval
+     */
     private Map<String, Integer> ipCache = new LinkedHashMap<>();
+    /**
+     * Max attempts of the same IP for the desidered interval
+     */
     private final int maxAttempts;
 
-    public SecurityLimiterService(@Value("${security.max_attempts}") int maxAttempts) {
+    public IPRateLimiterService(@Value("${security.max_attempts}") int maxAttempts) {
         this.maxAttempts = maxAttempts;
     }
 
+    /**
+     * Empties the ips cache on the specified interval.
+     */
     @Scheduled(fixedRateString = "${security.ttl.ips}")
     private void emptyIPCache() {
         LOGGER.info("Emptying ips cache");
@@ -30,7 +42,7 @@ public class SecurityLimiterService {
     }
 
     /**
-     * Extract IP from request
+     * Extracts the caller's IP from the request
      *
      * @param request HttpServletRequest
      * @return ip
