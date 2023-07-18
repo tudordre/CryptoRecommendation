@@ -34,7 +34,7 @@ Main features
 2. Clone this repository
 
 ```
-git clone https://github.com/ProjectorTeam/songprojector-be.git
+git clone https://github.com/tudordre/CryptoRecommendation.git
 ```
 
 3. Navigate into the folder
