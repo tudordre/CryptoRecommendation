@@ -47,7 +47,6 @@ public class CryptoCurrencyController {
             @ApiParam("year (between 2015 and 2025)") @RequestParam @NotNull @Min(value = 2015, message = "year must be minimum 2015") @Max(value = 2024, message = "year must be maximum 2024") int year,
             @ApiParam("month (between 1 and 12)") @RequestParam @NotNull @Min(value = 1, message = "month must be minimum 1") @Max(value = 12, message = "month must be minimum 12") @Valid int month,
             @ApiParam("period in months (between 1 and 120)") @RequestParam(required = false, defaultValue = "1") @Min(value = 1, message = "period must be minimum 1") @Max(value = 120, message = "period must be minimum 120") @Valid int period) {
-        System.out.println("get detailed crypto");
         return ResponseEntity.ok(cryptoCurrencyService.getDetailedCrypto(symbol, year, month, period));
     }
 
